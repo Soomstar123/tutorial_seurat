@@ -1,0 +1,89 @@
+<설명>
+# Problem statement
+
+**Background :**
+
+cognate cd4 t cell의 도움이 있어야지만 h60-cd8 t cells의 적절한 expansion이 일어날 수 있다 (Yoo et al. 2015). 이는 자연적으로도(cd4 helped condition), 혹은 실험실하에서 만들어진 cd4 helped condition에서도 동일하게 발생한다.(separate help condition에서도 cd4 t cell expansion, differentation은 일어나고 이는 cognate cd4 helped t cell과 유사한 패턴이다(Kim et al, 2015). Helpless T cell 은 cd8 T cell이 적절하게 help signal을 받지 못한 것이고 이에 따라 expansion이 되지 못한다. coganate helped t cell과 helpless t cell은 immune primming day 4 이후부터 t cell 조성이 달라진다. 
+
+Reference: 
+10.1038/emm.2014.107
+
+10.1038/ncomms8994
+
+
+**hypothesis**: 
+
+Dendritic cell(DC)가 CD8의 Expansion에 도움을 줄 것 이다.
+DC quantities and/or qualities would differ between helped and helpless
+T cells. (dc의 조성(양과 퀄리티)는 helped와 helpless에서 다르게 나타날 것이다.)
+따라서, helped T cell 에서만 나타나는 특정 dendritic cell의 cell subtype이 존
+재할 것이라 생각됌. 이는 특정 dendritic cell subtype이 변화하거나, dendritic
+cell 안의 어떠한 유전자 발현이 변화 될 것으로 생각됌.
+
+**ScRNA Sequencing Background :**
+
+파일은 세가지로 구성된다.
+다운로드한 파일은 “pbmc3k_filtered_gene_bc_matrices.tar” 파일이다.  “filtered_gene_bc_matrices” 폴더가 있고, 그 폴더 안에는 3가지 파일이 존재한다.: barcodes.tsv, genes.tsv, matrix.mtx
+
+barcodes.tsv는 DNA를 이용해 세포를 바코딩한 정보이다. Ex) AAACATACAACCAC-1
+genes.tsv는 유전자 정보이다. Ex) ENSG00000072310    SREBF1
+matrix.mtx는 각 세포에 특정 유전자의 발현량을 뜻한다. Ex) 32709 1 4 (해석: 32709번째 유전자, 1번 세포, 발현량 4.
+
+- Gene과 Feature는 같은 단어이다. Ex) genes.tsv = features.tsv
+- 사람의 유전자는 모두 대문자, 쥐의 유전자는 첫 글자만 대문자. Ex1) SREBF1 (사람), Srebf1 (쥐). Ex2) MT-CO3 (사람), mt-Co3 (쥐)
+
+10x Genomics 회사는 자체의 CellRanger 파이프라인이 있고, 이를 통해 barcodes.tsv (또는 barcodes.csv), features.tsv (또는 genes.tsv), matrix.mtx 파일을 생성한다. 
+
+filtered_feature_bc_matrix (폴더)
+├── barcodes.tsv.gz
+├── features.tsv.gz
+└── matrix.mtx.gz
+
+Feature-Barcode Matrices라고 부르는 이 세 가지 파일이 scRNA-seq 데이터 분석에서 가장 기본이며 핵심이 되는 데이터이다.
+
+# Designs
+
+- 샘플정보: Single cell data was generated from mouse line C57BL/6.
+1. Helped T cell: Dendritic cell (DC)이 외부 antigen을 CD4/CD8 T cell에 제시하여
+
+immune activation을 유도하는 signal 발현.
+
+1. Helpless T cell: CD8 activation 항원을 발현하는 세포만 주입해준 샘플. CD4와 DC
+
+의 상호작용을 볼 수 없고, CD8과 DC의 상호작용만 확인 가능하다.
+
+1. Naive T cell: Unimmunized한 T cell. 즉 면역 자극을 받지 않은, 항원에 반응하지 않
+
+는 비 활성된 T 세포.
+
+- 연구목적:
+
+helped데이터들은 dc의 도움을 받아, cd8이 잘 활동하게 일어나는 세포들이다. helpless는 dc의 도움을 잘 받지 못해 cd8으로 활발하게 expansion되지 못하는 세포들이다.
+선행연구에서 cd8 expansion으로 발전 하는데에 dc의 도움이 필요하다고 밝혀졌다.
+
+전체 rna 분석으로는 샘플 내 세포 집단의 평균 유전자 수준만 추정 할 수 있어 개별 세포 간의 유전자 발현 다양성을 고려하지 못한다. 싱글셀 분석을 통해서는 각각 단일 세포로부터 rna를 추출하고 분석한다. 세포 간 차이, 세포 상태의 변화, 조직 내 다양한 세포 타입들의 분포를 정밀하게 파악할 수 있다.
+
+우리는 연구의 가정을 dc가 cd8 expansion에 key role을 띈다고 설정했다. 따라서 내가 여기서 찾아야 할것은 싱글셀 분석을 통해 **helped, helpless, naive cell에서 DC cell 마커**들의 **1.차등발현하는 gene을 확인하고 2.해당 gene들의 ontology를 찾아** 이후 추가적으로 연구를 어떻게 더 발전시킬 수 있는지 고안해보는 것이다.
+
+
+<선행연구>
+
+[Subdominant H60 antigen-specific CD8 T-cell response precedes dominant H4 antigen-specific response during the initial phase of allogenic skin graft rejection - PubMed (nih.gov)](https://pubmed.ncbi.nlm.nih.gov/25676063/)
+
+[Memory programming in CD8+ T-cell differentiation is intrinsic and is not determined by CD4 help - PMC (nih.gov)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4557278/)
+
+<metods참고> 
+
+ https://www.embopress.org/doi/pdfdirect/10.15252/msb.20188746?download=true
+
+https://www.nature.com/articles/srep25696
+
+<배치효과 리뷰논문>
+
+https://www.nature.com/articles/s41587-020-00748-9
+
+<scrna분석 관련 참고자료>
+
+https://www.nature.com/articles/s41576-023-00586-w
+
+https://blog.naver.com/ruins0408/222778003966
